@@ -32,6 +32,7 @@ import Medications from './pages/Medications'
 import DentalTreatments from './pages/DentalTreatments'
 import ClinicNeeds from './pages/ClinicNeeds'
 import Expenses from './pages/Expenses'
+import ExternalEstimate from './pages/ExternalEstimate'
 import ThemeToggle from './components/ThemeToggle'
 import { AppSidebar } from './components/AppSidebar'
 import { AppSidebarTrigger } from './components/AppSidebarTrigger'
@@ -472,6 +473,8 @@ function AppContent() {
         return <Expenses />;
       case 'reports':
         return <ReportsPage />;
+      case 'external-estimate':
+        return <ExternalEstimate />;
       case 'settings':
         return <SettingsPage />;
       default:
@@ -501,6 +504,7 @@ function AppContent() {
       'clinic-needs': 'احتياجات العيادة',
       'expenses': 'مصروفات العيادة',
       reports: 'التقارير',
+      'external-estimate': 'فاتورة تقديرية خارجية',
       settings: 'الإعدادات'
     }
     return pageMap[activeTab as keyof typeof pageMap] || 'لوحة التحكم'

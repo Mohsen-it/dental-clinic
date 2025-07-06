@@ -935,6 +935,107 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* External Estimate Settings */}
+          <div className="bg-card rounded-lg shadow border border-border">
+            <div className="p-6 border-b border-border">
+              <h3 className="text-lg font-medium text-foreground">إعدادات الفاتورة التقديرية</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                إعدادات خاصة بالفواتير التقديرية الخارجية
+              </p>
+            </div>
+            <div className="p-6">
+              <form className="space-y-6" onSubmit={(e) => {
+                e.preventDefault()
+                const formData = new FormData(e.currentTarget)
+                const estimateData = {
+                  estimate_default_validity_days: parseInt(formData.get('estimate_default_validity_days') as string) || 30,
+                  estimate_default_tax_rate: parseFloat(formData.get('estimate_default_tax_rate') as string) || 0,
+                  estimate_default_notes: formData.get('estimate_default_notes') as string || '',
+                  estimate_show_clinic_stamp: formData.get('estimate_show_clinic_stamp') === 'on',
+                }
+                handleUpdateSettings(estimateData)
+              }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="estimate_default_validity_days" className="text-sm font-medium text-foreground">
+                      مدة صلاحية التقدير (بالأيام)
+                    </label>
+                    <input
+                      type="number"
+                      id="estimate_default_validity_days"
+                      name="estimate_default_validity_days"
+                      defaultValue={settings?.estimate_default_validity_days || 30}
+                      min="1"
+                      max="365"
+                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      عدد الأيام التي يكون فيها التقدير صالحاً (افتراضي: 30 يوم)
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="estimate_default_tax_rate" className="text-sm font-medium text-foreground">
+                      معدل الضريبة الافتراضي (%)
+                    </label>
+                    <input
+                      type="number"
+                      id="estimate_default_tax_rate"
+                      name="estimate_default_tax_rate"
+                      defaultValue={settings?.estimate_default_tax_rate || 0}
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      معدل الضريبة الذي سيتم تطبيقه افتراضياً على التقديرات
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="estimate_default_notes" className="text-sm font-medium text-foreground">
+                    الملاحظات الافتراضية
+                  </label>
+                  <textarea
+                    id="estimate_default_notes"
+                    name="estimate_default_notes"
+                    defaultValue={settings?.estimate_default_notes || ''}
+                    placeholder="ملاحظات تظهر في جميع التقديرات..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    نص افتراضي يظهر في قسم الملاحظات لجميع التقديرات الجديدة
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <input
+                    type="checkbox"
+                    id="estimate_show_clinic_stamp"
+                    name="estimate_show_clinic_stamp"
+                    defaultChecked={settings?.estimate_show_clinic_stamp !== false}
+                    className="w-4 h-4 text-primary bg-background border-input rounded focus:ring-primary focus:ring-2"
+                  />
+                  <label htmlFor="estimate_show_clinic_stamp" className="text-sm font-medium text-foreground">
+                    إظهار منطقة ختم العيادة في التقديرات
+                  </label>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'جاري الحفظ...' : 'حفظ إعدادات التقدير'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
 
         </div>
       )}

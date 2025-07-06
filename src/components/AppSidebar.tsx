@@ -14,6 +14,7 @@ import {
   Stethoscope,
   ClipboardList,
   Receipt,
+  FileText,
 } from "lucide-react"
 
 import {
@@ -89,6 +90,11 @@ const navigationItems = [
     title: "التقارير",
     url: "reports",
     icon: BarChart3,
+  },
+  {
+    title: "فاتورة تقديرية خارجية",
+    url: "external-estimate",
+    icon: FileText,
   },
   {
     title: "الإعدادات",

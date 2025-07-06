@@ -205,6 +205,11 @@ export interface ClinicSettings {
   working_days: string
   app_password?: string | null
   password_enabled?: number
+  // External estimate settings
+  estimate_default_validity_days?: number
+  estimate_default_tax_rate?: number
+  estimate_default_notes?: string
+  estimate_show_clinic_stamp?: boolean
   created_at: string
   updated_at: string
 }
