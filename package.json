@@ -146,8 +146,7 @@
       "menuCategory": "Healthcare",
       "warningsAsErrors": false,
       "unicode": true,
-      "guid": "dentalclinic-agorracode-v2.1",
-      "include": "installer/directory-fix.nsh"
+      "guid": "dentalclinic-agorracode-v2.1"
     },
     "mac": {
       "target": "dmg",

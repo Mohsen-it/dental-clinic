@@ -92,7 +92,7 @@ const navigationItems = [
     icon: BarChart3,
   },
   {
-    title: "فاتورة تقديرية خارجية",
+    title: "فاتورة تقديرية ",
     url: "external-estimate",
     icon: FileText,
   },
