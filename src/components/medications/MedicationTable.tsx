@@ -9,6 +9,13 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useMedicationStore } from '@/store/medicationStore'
 import { formatDate } from '@/lib/utils'
 import { notify } from '@/services/notificationService'
@@ -17,7 +24,11 @@ import {
   Trash2,
   Pill,
   FileText,
-  MoreHorizontal
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -36,12 +47,29 @@ interface MedicationTableProps {
 
 export default function MedicationTable({ medications, onEdit, onDelete, searchQuery }: MedicationTableProps) {
   const { isLoading } = useMedicationStore()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   // Filter medications based on search query
   const filteredMedications = medications.filter(medication =>
     medication.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (medication.instructions && medication.instructions.toLowerCase().includes(searchQuery.toLowerCase()))
   )
+
+  // Pagination
+  const totalCount = filteredMedications.length
+  const totalPages = Math.ceil(totalCount / pageSize)
+  const startIndex = (currentPage - 1) * pageSize
+  const paginatedMedications = filteredMedications.slice(startIndex, startIndex + pageSize)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(parseInt(value))
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
 
   const handleEdit = (medication: Medication) => {
     onEdit(medication)
@@ -93,10 +121,10 @@ export default function MedicationTable({ medications, onEdit, onDelete, searchQ
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredMedications.map((medication, index) => (
+          {paginatedMedications.map((medication, index) => (
             <TableRow key={medication.id} className="hover:bg-muted/50">
               <TableCell className="font-medium text-center">
-                {index + 1}
+                {startIndex + index + 1}
               </TableCell>
               <TableCell className="text-center">
                 <div className="flex items-center justify-center gap-2">
@@ -146,6 +174,79 @@ export default function MedicationTable({ medications, onEdit, onDelete, searchQ
           ))}
         </TableBody>
       </Table>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-2 py-4">
+          <div className="flex items-center space-x-6 space-x-reverse lg:space-x-8">
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <p className="text-sm font-medium arabic-enhanced">عدد الصفوف لكل صفحة</p>
+              <Select
+                value={`${pageSize}`}
+                onValueChange={handlePageSizeChange}
+              >
+                <SelectTrigger className="h-8 w-[70px]">
+                  <SelectValue placeholder={pageSize} />
+                </SelectTrigger>
+                <SelectContent side="top">
+                  {[5, 10, 20, 30, 50].map((size) => (
+                    <SelectItem key={size} value={`${size}`}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex w-[100px] items-center justify-center text-sm font-medium arabic-enhanced">
+              صفحة {currentPage} من {totalPages}
+            </div>
+
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <Button
+                variant="outline"
+                className="hidden h-8 w-8 p-0 lg:flex"
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+              >
+                <span className="sr-only">الذهاب إلى الصفحة الأولى</span>
+                <ChevronsRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-8 w-8 p-0"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <span className="sr-only">الذهاب إلى الصفحة السابقة</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                className="h-8 w-8 p-0"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <span className="sr-only">الذهاب إلى الصفحة التالية</span>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                className="hidden h-8 w-8 p-0 lg:flex"
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                <span className="sr-only">الذهاب إلى الصفحة الأخيرة</span>
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 space-x-reverse text-sm text-muted-foreground arabic-enhanced">
+            عرض {startIndex + 1} إلى {Math.min(startIndex + pageSize, totalCount)} من {totalCount} نتيجة
+          </div>
+        </div>
+      )}
 
       {/* Table Footer with Summary */}
       <div className="border-t bg-muted/30 px-4 py-3">

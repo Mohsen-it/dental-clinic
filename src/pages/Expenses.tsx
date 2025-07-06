@@ -3,6 +3,13 @@ import { useExpensesStore } from '../store/expensesStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select'
+import {
   DollarSign,
   Plus,
   Receipt,
@@ -10,7 +17,11 @@ import {
   AlertTriangle,
   Clock,
   Download,
-  CreditCard
+  CreditCard,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from 'lucide-react'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import CurrencyDisplay from '@/components/ui/currency-display'
@@ -51,6 +62,8 @@ const Expenses: React.FC = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [editingExpense, setEditingExpense] = useState<ClinicExpense | null>(null)
   const [deletingExpense, setDeletingExpense] = useState<ClinicExpense | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   useEffect(() => {
     loadExpenses()
@@ -62,6 +75,21 @@ const Expenses: React.FC = () => {
 
   const handleFilterChange = (newFilters: any) => {
     setFilters({ ...filters, ...newFilters })
+  }
+
+  // Pagination
+  const totalCount = filteredExpenses.length
+  const totalPages = Math.ceil(totalCount / pageSize)
+  const startIndex = (currentPage - 1) * pageSize
+  const paginatedExpenses = filteredExpenses.slice(startIndex, startIndex + pageSize)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(parseInt(value))
+    setCurrentPage(1) // Reset to first page when changing page size
   }
 
   const handleClearFilters = () => {
@@ -248,8 +276,9 @@ const Expenses: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {filteredExpenses.map((expense) => (
+            <>
+              <div className="space-y-4">
+                {paginatedExpenses.map((expense) => (
                 <div
                   key={expense.id}
                   className="flex items-center justify-between p-4 border border-border rounded-lg bg-card"
@@ -289,8 +318,82 @@ const Expenses: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-2 py-4 mt-6 border-t">
+                <div className="flex items-center space-x-6 space-x-reverse lg:space-x-8">
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <p className="text-sm font-medium arabic-enhanced">عدد العناصر لكل صفحة</p>
+                    <Select
+                      value={`${pageSize}`}
+                      onValueChange={handlePageSizeChange}
+                    >
+                      <SelectTrigger className="h-8 w-[70px]">
+                        <SelectValue placeholder={pageSize} />
+                      </SelectTrigger>
+                      <SelectContent side="top">
+                        {[5, 10, 20, 30, 50].map((size) => (
+                          <SelectItem key={size} value={`${size}`}>
+                            {size}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex w-[100px] items-center justify-center text-sm font-medium arabic-enhanced">
+                    صفحة {currentPage} من {totalPages}
+                  </div>
+
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Button
+                      variant="outline"
+                      className="hidden h-8 w-8 p-0 lg:flex"
+                      onClick={() => handlePageChange(1)}
+                      disabled={currentPage === 1}
+                    >
+                      <span className="sr-only">الذهاب إلى الصفحة الأولى</span>
+                      <ChevronsRight className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <span className="sr-only">الذهاب إلى الصفحة السابقة</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <span className="sr-only">الذهاب إلى الصفحة التالية</span>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="hidden h-8 w-8 p-0 lg:flex"
+                      onClick={() => handlePageChange(totalPages)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <span className="sr-only">الذهاب إلى الصفحة الأخيرة</span>
+                      <ChevronsLeft className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 space-x-reverse text-sm text-muted-foreground arabic-enhanced">
+                  عرض {startIndex + 1} إلى {Math.min(startIndex + pageSize, totalCount)} من {totalCount} نتيجة
+                </div>
+              </div>
+            )}
+            </>
           )}
         </CardContent>
       </Card>
